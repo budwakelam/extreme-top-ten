@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extreme Top Ten — The Factual Record Engine</title>
+    <meta name="description" content="Objective top 10 lists of human feats, natural extremes, engineering marvels, and verified superlatives.">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --border: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem 1rem; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--accent); letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 2.5rem; }
+        input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 16px; outline: none; min-width: 0; }
+        input:focus { border-color: var(--accent); }
+        button { padding: 14px 28px; border-radius: 8px; border: none; background: var(--accent-hover); color: white; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s; white-space: nowrap; }
+        button:hover { background: var(--accent); color: #0f172a; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.2rem; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .rank { font-size: 1.25rem; font-weight: bold; color: var(--accent); }
+        .stat-badge { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
+        .card p { line-height: 1.6; margin: 0 0 1rem 0; color: #e2e8f0; }
+        .meta { color: var(--text-muted); font-size: 0.85rem; display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--border); padding-top: 0.75rem; flex-wrap: wrap; }
+        .loading { text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem; }
+        .src-tag { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EXTREME TOP TEN</h1>
+        <div class="subtitle">Objective records, extreme measurements, and verified superlatives.</div>
+
+        <div class="search-box">
+            <input type="text" id="topicInput" placeholder="Enter a topic (e.g., Deepest oceanic trenches, tallest buildings)..." onkeypress="handleKeyPress(event)">
+            <button onclick="fetchTopTen()">Generate</button>
+        </div>
+
+        <div id="results"></div>
+        <div class="src-tag">extremetop10.com — impartial, data-informed top 10s</div>
+    </div>
+
+    <script>
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') fetchTopTen();
+        }
+
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        async function fetchTopTen() {
+            const topic = document.getElementById('topicInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            if(!topic) return;
+
+            resultsDiv.innerHTML = '<div class="loading">Querying verified global records and compiling data...</div>';
+
+            try {
+                const response = await fetch('/api/get-top-ten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: topic })
+                });
+
+                const resData = await response.json();
+                if(!response.ok) throw new Error(resData.detail || 'Failed to fetch data');
+
+                const data = resData.data;
+                const src = resData.source === 'cache' ? 'from cache' : 'generated live';
+                let html = `<h2 style="color: #f8fafc; margin-top: 2rem;">${esc(data.title)}</h2>`
+                    + `<p style="color:var(--text-muted); margin-bottom: 1.5rem;">${esc(data.description)} <span style="font-size:0.8em;">(${esc(src)})</span></p>`;
+
+                (data.items || []).forEach(item => {
+                    html += `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="rank">#${esc(item.rank)} &mdash; ${esc(item.name)}</span>
+                                <span class="stat-badge">${esc(item.key_stat)}</span>
+                            </div>
+                            <p>${esc(item.summary)}</p>
+                            <div class="meta">
+                                <span>Context: ${esc(item.location_or_year)}</span>
+                                <span>Source: ${esc(item.source)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resultsDiv.innerHTML = html;
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="card" style="border-color: #ef4444;"><p style="color:#ef4444; margin:0;">Error: ${esc(err.message)}</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>
