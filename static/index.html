@@ -30,30 +30,36 @@
             background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
             -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-        /* ---- Netflix-style hero ---- */
-        .hero { position: relative; border-radius: 16px; overflow: hidden; height: 330px;
-            border: 1px solid var(--border); margin-bottom: 1.1rem; background: var(--card-bg); }
-        @media (min-width: 700px) { .hero { height: 400px; } }
+        /* ---- Netflix-style hero (full-bleed) ---- */
+        .hero { position: relative; overflow: hidden; height: 340px;
+            border-bottom: 1px solid var(--border); margin-bottom: 1rem; background: var(--card-bg); }
+        @media (min-width: 700px) { .hero { height: 470px; } }
         .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; pointer-events: none; }
         .slide.active { opacity: 1; pointer-events: auto; }
-        .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+            object-position: 72% 18%; }
         .slide .fade { position: absolute; inset: 0;
             background:
-                linear-gradient(90deg, rgba(15,23,42,0.96) 0%, rgba(15,23,42,0.62) 42%, rgba(15,23,42,0.05) 72%),
-                linear-gradient(0deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0) 45%); }
-        .slide .copy { position: absolute; left: 0; bottom: 0; padding: 1.1rem 1.1rem 2.6rem; max-width: 78%; }
-        .slide .kicker { font-size: 0.68rem; letter-spacing: 2px; color: var(--accent); font-weight: 800; margin-bottom: 0.4rem; }
-        .slide h2 { font-size: 1.55rem; line-height: 1.15; margin: 0 0 0.5rem; font-weight: 800; }
-        @media (min-width: 700px) { .slide h2 { font-size: 2.2rem; } }
-        .slide p { font-size: 0.85rem; color: #cbd5e1; margin: 0 0 0.9rem; line-height: 1.5; }
+                linear-gradient(90deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.72) 38%, rgba(15,23,42,0.08) 68%),
+                linear-gradient(0deg, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0) 42%); }
+        .slide .copy { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 920px; padding: 0 1.1rem 3rem; }
+        .slide .kicker { font-size: 0.7rem; letter-spacing: 2.5px; color: var(--accent); font-weight: 800; margin-bottom: 0.5rem; }
+        .slide h2 { font-size: 1.7rem; line-height: 1.12; margin: 0 0 0.55rem; font-weight: 800; max-width: 12ch; }
+        @media (min-width: 700px) {
+            .slide h2 { font-size: 3.6rem; max-width: 14ch; }
+            .slide p { font-size: 1.05rem !important; max-width: 46ch; }
+            .slide .copy { padding-bottom: 3.4rem; }
+        }
+        .slide p { font-size: 0.88rem; color: #cbd5e1; margin: 0 0 1rem; line-height: 1.55; }
         .hero-btn { display: inline-block; background: linear-gradient(135deg, var(--accent-hover), #7c3aed);
-            color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.88rem;
+            color: #fff; border: none; border-radius: 10px; padding: 11px 22px; font-size: 0.9rem;
             font-weight: 700; cursor: pointer; }
         .hero-btn:active { transform: scale(0.97); }
-        .dots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; gap: 7px; justify-content: center; }
+        .dots { position: absolute; bottom: 14px; left: 0; right: 0; display: flex; gap: 7px; justify-content: center; }
         .dot { width: 22px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.28); cursor: pointer; }
         .dot.on { background: var(--accent); }
-        .hero-credit { position: absolute; right: 10px; bottom: 34px; font-size: 0.62rem; color: rgba(255,255,255,0.65); }
+        .hero-credit { position: absolute; right: 12px; bottom: 36px; font-size: 0.62rem; color: rgba(255,255,255,0.65); }
         .hero-credit a { color: rgba(255,255,255,0.8); text-decoration: none; }
 
         .tagline { text-align: center; color: var(--text-muted); font-size: 0.82rem; margin: 0 0 0.2rem; }
@@ -155,15 +161,16 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="topbar">
-            <div class="wordmark">⚡ EXTREME TOP TEN</div>
-        </div>
+    <div class="topbar">
+        <div class="wordmark">⚡ EXTREME TOP TEN</div>
+    </div>
 
-        <div class="hero" id="hero">
-            <div id="slides"></div>
-            <div class="dots" id="dots"></div>
-        </div>
+    <div class="hero" id="hero">
+        <div id="slides"></div>
+        <div class="dots" id="dots"></div>
+    </div>
+
+    <div class="container">
         <p class="tagline">Objective records, extreme measurements, verified superlatives.</p>
 
         <div class="search-box">
