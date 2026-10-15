@@ -7,11 +7,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-import google.generativeai as genai
+from google import genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+_gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 app = FastAPI(title="Extreme Top Ten API")
 
@@ -108,9 +107,10 @@ async def get_top_ten(req: QueryRequest):
     """
 
     try:
-        model = genai.GenerativeModel("gemini-3.8-flash")
-        response = model.generate_content(
-            prompt, generation_config={"response_mime_type": "application/json"}
+        response = _gemini_client.models.generate_content(
+            model="gemini-flash-lite-latest",
+            contents=prompt,
+            config={"response_mime_type": "application/json"},
         )
         data = json.loads(response.text)
     except Exception as e:
