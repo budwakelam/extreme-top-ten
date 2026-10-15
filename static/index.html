@@ -101,6 +101,18 @@
         .recent-chip { font-size: 0.8rem; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 20px; padding: 6px 13px; cursor: pointer; }
         .recent-chip:hover { color: var(--accent); border-color: var(--accent); }
 
+        /* ---- record archive ---- */
+        .arch-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+        .arch-row { display: flex; align-items: center; gap: 12px; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.9rem; cursor: pointer;
+            transition: border-color 0.15s, transform 0.15s; }
+        .arch-row:hover { border-color: var(--accent); transform: translateX(3px); }
+        .arch-icon { font-size: 1.35rem; flex-shrink: 0; }
+        .arch-title { flex: 1; font-weight: 600; font-size: 0.9rem; line-height: 1.35; min-width: 0; }
+        .arch-meta { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+        .arch-empty { color: var(--text-muted); font-size: 0.85rem; text-align: center;
+            padding: 1.6rem 1rem; border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 2rem; }
+
         /* ---- results view ---- */
         #resultsView { display: none; }
         .res-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 0.8rem;
@@ -181,6 +193,12 @@
         <div id="homeView">
             <h2 class="section-title">🔥 Trending now <span class="hint">tap a card to generate its list</span></h2>
             <div id="trending" class="trend-grid"></div>
+
+            <h2 class="section-title">📚 The record archive <span class="hint"><span id="archCount">0</span> lists on file — every list ever generated, kept on record</span></h2>
+            <div class="search-box" style="margin-bottom:0.8rem;">
+                <input type="text" id="archInput" placeholder="Search the archive…" oninput="archSearch(this.value)" style="padding:10px 14px; font-size:14px;">
+            </div>
+            <div id="archive" class="arch-list"></div>
 
             <div id="recentWrap" style="display:none;">
                 <h2 class="section-title">🕘 Recently generated <span class="hint">on this device</span></h2>
@@ -347,6 +365,36 @@
             ).join("");
         }
 
+        /* ---------- record archive ---------- */
+        let archCache = [];
+        async function fetchArchive(q) {
+            try {
+                const r = await fetch('/api/lists' + (q ? '?q=' + encodeURIComponent(q) : ''));
+                const d = await r.json();
+                archCache = d.lists || [];
+                renderArchive();
+            } catch (e) { /* archive is a bonus — never break the page */ }
+        }
+        function renderArchive() {
+            const el = document.getElementById("archive");
+            document.getElementById("archCount").textContent = archCache.length;
+            if (!archCache.length) {
+                el.innerHTML = `<div class="arch-empty" style="margin-bottom:0;">📭 No records on file yet — generate the first one above.</div>`;
+                return;
+            }
+            el.innerHTML = archCache.map(l => `
+                <div class="arch-row" onclick='pickTopic(${JSON.stringify(l.topic)})'>
+                    <span class="arch-icon">📚</span>
+                    <span class="arch-title">${esc(l.title)}</span>
+                    <span class="arch-meta">${l.items} records · on file since ${esc(l.on_record_since)}</span>
+                </div>`).join("");
+        }
+        let archT = null;
+        function archSearch(v) {
+            clearTimeout(archT);
+            archT = setTimeout(() => fetchArchive(v.trim()), 350);
+        }
+
         function esc(s) {
             return String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -477,6 +525,7 @@
                     <p class="res-desc">${esc(data.description)}</p>
                     <div>${items}</div>`);
                 recordRecent(topic);
+                fetchArchive();
             } catch (err) {
                 stopLoading();
                 if (err.name === 'AbortError') return;
@@ -495,6 +544,7 @@
         renderHero();
         renderTrending();
         renderRecent();
+        fetchArchive();
     </script>
 </body>
 </html>

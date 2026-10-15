@@ -121,6 +121,39 @@ def health():
     return {"status": "ok", "generator_configured": bool(GEMINI_API_KEY)}
 
 
+@app.get("/api/lists")
+def list_lists(q: str = ""):
+    """The record archive: every list ever generated, searchable."""
+    with db() as conn:
+        if q.strip():
+            like = f"%{q.strip().lower()}%"
+            rows = conn.execute(
+                "SELECT topic, data_json, created_at FROM top_tens "
+                "WHERE topic LIKE ? ORDER BY created_at DESC LIMIT 100",
+                (like,),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT topic, data_json, created_at FROM top_tens "
+                "ORDER BY created_at DESC LIMIT 100"
+            ).fetchall()
+    out = []
+    for topic, data_json, created_at in rows:
+        try:
+            data = json.loads(data_json)
+        except Exception:
+            continue
+        out.append(
+            {
+                "topic": topic,
+                "title": data.get("title") or topic,
+                "items": len(data.get("items") or []),
+                "on_record_since": (created_at or "")[:10],
+            }
+        )
+    return {"lists": out, "count": len(out)}
+
+
 @app.post("/api/get-top-ten")
 async def get_top_ten(req: QueryRequest):
     topic_clean = req.topic.strip().lower()
