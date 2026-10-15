@@ -25,13 +25,38 @@
         .container { max-width: 920px; margin: 0 auto; padding: 1.1rem 0.9rem 3rem; }
 
         /* ---- header ---- */
-        .hero { text-align: center; padding: 1.2rem 0 1rem; }
-        .hero h1 {
-            margin: 0 0 0.3rem; font-size: 1.7rem; letter-spacing: 2px; font-weight: 800;
+        .topbar { display: flex; align-items: center; justify-content: center; padding: 0.9rem 0 0.7rem; }
+        .topbar .wordmark { font-size: 1.05rem; letter-spacing: 2.5px; font-weight: 800;
             background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-        }
-        .hero .subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+            -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+        /* ---- Netflix-style hero ---- */
+        .hero { position: relative; border-radius: 16px; overflow: hidden; height: 330px;
+            border: 1px solid var(--border); margin-bottom: 1.1rem; background: var(--card-bg); }
+        @media (min-width: 700px) { .hero { height: 400px; } }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; pointer-events: none; }
+        .slide.active { opacity: 1; pointer-events: auto; }
+        .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .slide .fade { position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, rgba(15,23,42,0.96) 0%, rgba(15,23,42,0.62) 42%, rgba(15,23,42,0.05) 72%),
+                linear-gradient(0deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0) 45%); }
+        .slide .copy { position: absolute; left: 0; bottom: 0; padding: 1.1rem 1.1rem 2.6rem; max-width: 78%; }
+        .slide .kicker { font-size: 0.68rem; letter-spacing: 2px; color: var(--accent); font-weight: 800; margin-bottom: 0.4rem; }
+        .slide h2 { font-size: 1.55rem; line-height: 1.15; margin: 0 0 0.5rem; font-weight: 800; }
+        @media (min-width: 700px) { .slide h2 { font-size: 2.2rem; } }
+        .slide p { font-size: 0.85rem; color: #cbd5e1; margin: 0 0 0.9rem; line-height: 1.5; }
+        .hero-btn { display: inline-block; background: linear-gradient(135deg, var(--accent-hover), #7c3aed);
+            color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.88rem;
+            font-weight: 700; cursor: pointer; }
+        .hero-btn:active { transform: scale(0.97); }
+        .dots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; gap: 7px; justify-content: center; }
+        .dot { width: 22px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.28); cursor: pointer; }
+        .dot.on { background: var(--accent); }
+        .hero-credit { position: absolute; right: 10px; bottom: 34px; font-size: 0.62rem; color: rgba(255,255,255,0.65); }
+        .hero-credit a { color: rgba(255,255,255,0.8); text-decoration: none; }
+
+        .tagline { text-align: center; color: var(--text-muted); font-size: 0.82rem; margin: 0 0 0.2rem; }
 
         /* ---- search ---- */
         .search-box { display: flex; gap: 8px; margin: 1rem 0 1.4rem; }
@@ -131,10 +156,15 @@
 </head>
 <body>
     <div class="container">
-        <div class="hero">
-            <h1>⚡ EXTREME TOP TEN</h1>
-            <p class="subtitle">Objective records, extreme measurements, verified superlatives.</p>
+        <div class="topbar">
+            <div class="wordmark">⚡ EXTREME TOP TEN</div>
         </div>
+
+        <div class="hero" id="hero">
+            <div id="slides"></div>
+            <div class="dots" id="dots"></div>
+        </div>
+        <p class="tagline">Objective records, extreme measurements, verified superlatives.</p>
 
         <div class="search-box">
             <input type="text" id="topicInput" placeholder="Try &quot;deepest caves&quot;…" onkeypress="handleKeyPress(event)">
@@ -157,6 +187,62 @@
     </div>
 
     <script>
+        /* ---------- Netflix hero ---------- */
+        const HERO_SLIDES = [
+            { img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Burj_Khalifa_Dubai%2C_UAE_at_Sunset_001_by_Eric_Chamchoum.jpg/1920px-Burj_Khalifa_Dubai%2C_UAE_at_Sunset_001_by_Eric_Chamchoum.jpg",
+              credit: "ECWiki1", creditUrl: "https://commons.wikimedia.org/wiki/File:Burj_Khalifa_Dubai,_UAE_at_Sunset_001_by_Eric_Chamchoum.jpg",
+              kicker: "ENGINEERING", title: "828 meters of pure ambition",
+              sub: "The world's tallest buildings, ranked by height.",
+              topic: "Tallest buildings in the world" },
+            { img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Cheetah-_the_fastest_land_animal_%2816443131962%29.jpg/1920px-Cheetah-_the_fastest_land_animal_%2816443131962%29.jpg",
+              credit: "shankar s.", creditUrl: "https://commons.wikimedia.org/wiki/File:Cheetah-_the_fastest_land_animal_(16443131962).jpg",
+              kicker: "NATURE", title: "0–100 in three seconds flat",
+              sub: "The fastest land animals on Earth, clocked.",
+              topic: "Fastest land animals" },
+            { img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1920px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+              credit: "Luca Galuzzi", creditUrl: "https://commons.wikimedia.org/wiki/File:Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+              kicker: "NATURE", title: "The roof of the world",
+              sub: "The tallest mountains ever measured.",
+              topic: "Tallest mountains on Earth" },
+            { img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Etna_eruption_seen_from_the_International_Space_Station.jpg/1920px-Etna_eruption_seen_from_the_International_Space_Station.jpg",
+              credit: "NASA", creditUrl: "https://commons.wikimedia.org/wiki/File:Etna_eruption_seen_from_the_International_Space_Station.jpg",
+              kicker: "NATURE", title: "Eruptions visible from space",
+              sub: "The most powerful volcanic eruptions in history.",
+              topic: "Most powerful volcanic eruptions" },
+            { img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Blow_of_a_blue_whale_in_the_Arctic_sea.jpg/1920px-Blow_of_a_blue_whale_in_the_Arctic_sea.jpg",
+              credit: "AWeith", creditUrl: "https://commons.wikimedia.org/wiki/File:Blow_of_a_blue_whale_in_the_Arctic_sea.jpg",
+              kicker: "NATURE", title: "The biggest heart on Earth",
+              sub: "The largest animals to ever live, ranked.",
+              topic: "Largest animals on Earth" }
+        ];
+        let heroIdx = 0, heroTimer = null;
+
+        function renderHero() {
+            document.getElementById("slides").innerHTML = HERO_SLIDES.map((s, i) => `
+                <div class="slide${i === 0 ? " active" : ""}">
+                    <img src="${s.img}" alt="${esc(s.title)}"${i > 0 ? ' loading="lazy"' : ""}>
+                    <div class="fade"></div>
+                    <div class="copy">
+                        <div class="kicker">${esc(s.kicker)}</div>
+                        <h2>${esc(s.title)}</h2>
+                        <p>${esc(s.sub)}</p>
+                        <button class="hero-btn" onclick='pickTopic(${JSON.stringify(s.topic)})'>Get the top 10 →</button>
+                    </div>
+                    <div class="hero-credit">📷 <a href="${s.creditUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(s.credit)}</a></div>
+                </div>`).join("");
+            document.getElementById("dots").innerHTML = HERO_SLIDES.map((_, i) =>
+                `<span class="dot${i === 0 ? " on" : ""}" onclick="goSlide(${i})"></span>`).join("");
+            heroTimer = setInterval(() => goSlide((heroIdx + 1) % HERO_SLIDES.length), 7000);
+        }
+        function goSlide(i) {
+            heroIdx = i;
+            const slides = document.querySelectorAll("#slides .slide");
+            const dots = document.querySelectorAll("#dots .dot");
+            slides.forEach((el, j) => el.classList.toggle("active", j === i));
+            dots.forEach((el, j) => el.classList.toggle("on", j === i));
+            if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide((heroIdx + 1) % HERO_SLIDES.length), 7000); }
+        }
+
         /* ============================================================
            MOCK popularity layer.
            Votes + recent history live in localStorage; trending list is
@@ -398,6 +484,7 @@
         // Warm up the free-tier instance while the visitor browses,
         // so the first generation doesn't pay the full cold-start cost.
         fetch('/api/health').catch(() => {});
+        renderHero();
         renderTrending();
         renderRecent();
     </script>
