@@ -14,88 +14,159 @@
             --text-muted: #94a3b8;
             --accent: #38bdf8;
             --accent-hover: #0284c7;
+            --green: #4ade80;
+            --amber: #fbbf24;
+            --purple: #c084fc;
+            --pink: #f472b6;
+            --indigo: #818cf8;
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem 1rem; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { text-align: center; color: var(--accent); letter-spacing: 1px; margin-bottom: 0.5rem; }
-        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 2rem; }
-        input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 16px; outline: none; min-width: 0; }
-        input:focus { border-color: var(--accent); }
-        button { padding: 14px 28px; border-radius: 8px; border: none; background: var(--accent-hover); color: white; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s; white-space: nowrap; }
-        button:hover { background: var(--accent); color: #0f172a; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.2rem; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .rank { font-size: 1.25rem; font-weight: bold; color: var(--accent); }
-        .stat-badge { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
-        .card p { line-height: 1.6; margin: 0 0 1rem 0; color: #e2e8f0; }
-        .meta { color: var(--text-muted); font-size: 0.85rem; display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--border); padding-top: 0.75rem; flex-wrap: wrap; }
-        .loading { text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem; }
-        .src-tag { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 2rem; }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        .container { max-width: 920px; margin: 0 auto; padding: 1.1rem 0.9rem 3rem; }
 
-        /* ---- Trending / popularity mock ---- */
-        .section-title { color: var(--text); font-size: 1.1rem; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 8px; }
-        .section-title .hint { font-size: 0.78rem; color: var(--text-muted); font-weight: normal; }
-        .trend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 2.5rem; }
-        .trend-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; cursor: pointer; transition: border-color 0.15s, transform 0.15s; position: relative; }
-        .trend-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .trend-cat { display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 2px 8px; margin-bottom: 0.6rem; }
-        .trend-topic { font-weight: bold; font-size: 1rem; margin: 0 0 0.4rem 0; color: var(--text); }
-        .trend-teaser { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 0.8rem 0; line-height: 1.45; }
+        /* ---- header ---- */
+        .hero { text-align: center; padding: 1.2rem 0 1rem; }
+        .hero h1 {
+            margin: 0 0 0.3rem; font-size: 1.7rem; letter-spacing: 2px; font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero .subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+
+        /* ---- search ---- */
+        .search-box { display: flex; gap: 8px; margin: 1rem 0 1.4rem; }
+        input { flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 16px; outline: none; min-width: 0; }
+        input:focus { border-color: var(--accent); }
+        .go-btn { padding: 12px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, var(--accent-hover), #7c3aed); color: white; cursor: pointer; font-weight: bold; font-size: 15px; white-space: nowrap; }
+        .go-btn:active { transform: scale(0.97); }
+
+        /* ---- sections ---- */
+        .section-title { font-size: 1rem; margin: 0 0 0.7rem; display: flex; align-items: center; gap: 8px; }
+        .section-title .hint { font-size: 0.72rem; color: var(--text-muted); font-weight: normal; }
+
+        /* ---- trending grid: dense 2-col on mobile ---- */
+        .trend-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 2rem; }
+        @media (min-width: 700px) { .trend-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1000px) { .trend-grid { grid-template-columns: repeat(4, 1fr); } }
+        .trend-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--cat, var(--accent));
+            border-radius: 12px; padding: 0.7rem 0.75rem; cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s; display: flex; flex-direction: column;
+        }
+        .trend-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .trend-emoji { font-size: 1.5rem; line-height: 1; margin-bottom: 0.35rem; }
+        .trend-cat { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--cat, var(--accent)); font-weight: 700; margin-bottom: 0.25rem; }
+        .trend-topic { font-weight: 700; font-size: 0.88rem; margin: 0 0 0.3rem; color: var(--text); line-height: 1.3; }
+        .trend-teaser { font-size: 0.75rem; color: var(--text-muted); margin: 0 0 0.6rem; line-height: 1.4; flex: 1;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .trend-foot { display: flex; justify-content: space-between; align-items: center; }
-        .trend-votes { font-size: 0.8rem; color: var(--text-muted); }
-        .vote-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
-        .vote-btn:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+        .trend-votes { font-size: 0.72rem; color: var(--text-muted); }
+        .vote-btn { background: rgba(56,189,248,0.08); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 5px 10px; font-size: 0.72rem; border-radius: 20px; cursor: pointer; font-weight: 600; }
+        .vote-btn:hover { border-color: var(--accent); color: var(--accent); }
         .vote-btn.voted { border-color: var(--accent); color: var(--accent); cursor: default; }
-        .recent-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.5rem; }
-        .recent-chip { font-size: 0.85rem; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 20px; padding: 6px 14px; cursor: pointer; }
+
+        .recent-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+        .recent-chip { font-size: 0.8rem; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 20px; padding: 6px 13px; cursor: pointer; }
         .recent-chip:hover { color: var(--accent); border-color: var(--accent); }
+
+        /* ---- results view ---- */
+        #resultsView { display: none; }
+        .res-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 0.8rem;
+            position: sticky; top: 0; background: var(--bg); padding: 0.6rem 0; z-index: 5; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text);
+            border-radius: 20px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .src-pill { font-size: 0.72rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; white-space: nowrap; }
+        .src-pill.live { color: var(--green); border-color: var(--green); }
+        .res-title { font-size: 1.35rem; margin: 0 0 0.4rem; line-height: 1.3; }
+        .res-desc { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.1rem; line-height: 1.55; }
+
+        .res-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+            margin-bottom: 0.6rem; overflow: hidden; }
+        .res-row { display: flex; align-items: center; gap: 10px; padding: 0.75rem 0.9rem; cursor: pointer; }
+        .res-row:active { background: rgba(56,189,248,0.05); }
+        .medal { font-size: 1.3rem; flex-shrink: 0; width: 2rem; text-align: center; }
+        .rank-num { font-size: 0.95rem; font-weight: 800; color: var(--accent); flex-shrink: 0; width: 2rem; text-align: center; }
+        .res-name { flex: 1; font-weight: 600; font-size: 0.92rem; line-height: 1.35; min-width: 0; }
+        .stat-badge { background: rgba(56,189,248,0.1); color: var(--accent); border: 1px solid var(--accent);
+            padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+        .chev { color: var(--text-muted); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
+        .res-item.open .chev { transform: rotate(180deg); }
+        .res-detail { display: none; padding: 0 0.9rem 0.9rem 3.2rem; }
+        .res-item.open .res-detail { display: block; }
+        .res-detail p { color: #e2e8f0; font-size: 0.85rem; line-height: 1.6; margin: 0 0 0.6rem; }
+        .res-meta { color: var(--text-muted); font-size: 0.72rem; display: flex; gap: 12px; flex-wrap: wrap;
+            border-top: 1px dashed var(--border); padding-top: 0.5rem; }
+
+        /* ---- loading ---- */
+        .loading-box { text-align: center; padding: 3rem 1rem; }
+        .spinner { width: 44px; height: 44px; margin: 0 auto 1rem; border-radius: 50%;
+            border: 4px solid var(--border); border-top-color: var(--accent); animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-msg { color: var(--text); font-size: 0.95rem; font-weight: 600; min-height: 1.4em; }
+        .loading-sub { color: var(--text-muted); font-size: 0.78rem; margin-top: 0.5rem; }
+
+        .err-card { background: var(--card-bg); border: 1px solid #ef4444; border-radius: 12px; padding: 1.2rem; }
+        .err-card p { color: #ef4444; margin: 0; font-size: 0.9rem; }
+
+        .src-tag { text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 2.5rem; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>EXTREME TOP TEN</h1>
-        <div class="subtitle">Objective records, extreme measurements, and verified superlatives.</div>
+        <div class="hero">
+            <h1>⚡ EXTREME TOP TEN</h1>
+            <p class="subtitle">Objective records, extreme measurements, verified superlatives.</p>
+        </div>
 
         <div class="search-box">
-            <input type="text" id="topicInput" placeholder="Enter a topic (e.g., Deepest oceanic trenches, tallest buildings)..." onkeypress="handleKeyPress(event)">
-            <button onclick="fetchTopTen()">Generate</button>
+            <input type="text" id="topicInput" placeholder="Try &quot;deepest caves&quot;…" onkeypress="handleKeyPress(event)">
+            <button class="go-btn" onclick="fetchTopTen()">Generate</button>
         </div>
 
-        <div id="results"></div>
+        <div id="homeView">
+            <h2 class="section-title">🔥 Trending now <span class="hint">tap a card to generate its list</span></h2>
+            <div id="trending" class="trend-grid"></div>
 
-        <h2 class="section-title">&#128293; Trending now <span class="hint">what visitors are generating &amp; upvoting</span></h2>
-        <div id="trending" class="trend-grid"></div>
-
-        <div id="recentWrap" style="display:none;">
-            <h2 class="section-title">Recently generated <span class="hint">on this device</span></h2>
-            <div id="recent" class="recent-row"></div>
+            <div id="recentWrap" style="display:none;">
+                <h2 class="section-title">🕘 Recently generated <span class="hint">on this device</span></h2>
+                <div id="recent" class="recent-row"></div>
+            </div>
         </div>
 
-        <div class="src-tag">extremetop10.com — impartial, data-informed top 10s</div>
+        <div id="resultsView"></div>
+
+        <div class="src-tag">extremetop10.com · impartial, data-informed top 10s</div>
     </div>
 
     <script>
         /* ============================================================
            MOCK popularity layer.
-           Right now: votes + recent history live in localStorage, and the
-           trending list is a hand-picked seed array below.
-           Later (real): GET /api/trending served from server-side counts of
-           what visitors actually generate + their upvotes.
+           Votes + recent history live in localStorage; trending list is
+           a hand-picked seed. Later (real): GET /api/trending served from
+           server-side counts of what visitors generate + their upvotes.
            ============================================================ */
+        const CATS = {
+            nature:      { emoji: "🌿", color: "#4ade80", label: "Nature" },
+            engineering: { emoji: "🏗️", color: "#fbbf24", label: "Engineering" },
+            human:       { emoji: "🏅", color: "#c084fc", label: "Human feats" },
+            history:     { emoji: "📜", color: "#f472b6", label: "History" },
+            space:       { emoji: "🚀", color: "#818cf8", label: "Space" }
+        };
         const TRENDING_SEED = [
-            { topic: "Tallest buildings in the world",      teaser: "The race for the sky — from the Burj Khalifa upward.", cat: "Engineering", votes: 342 },
-            { topic: "Deepest oceanic trenches",             teaser: "Down where the pressure crushes steel.",              cat: "Nature",      votes: 318 },
-            { topic: "Fastest land animals",                teaser: "Zero to prey in under three seconds.",                cat: "Nature",      votes: 295 },
-            { topic: "Largest earthquakes ever recorded",   teaser: "The ground moved — a lot.",                           cat: "Nature",      votes: 271 },
-            { topic: "Tallest mountains on Earth",          teaser: "Eight-thousanders and the roof of the world.",        cat: "Nature",      votes: 254 },
-            { topic: "Fastest production cars",             teaser: "Street-legal machines chasing 500 km/h.",             cat: "Engineering", votes: 238 },
-            { topic: "Most powerful volcanic eruptions",    teaser: "Eruptions that changed the climate.",                 cat: "Nature",      votes: 219 },
-            { topic: "Longest rivers in the world",         teaser: "The Nile vs. Amazon debate, settled by the numbers.", cat: "Nature",      votes: 196 },
-            { topic: "Biggest ships ever built",            teaser: "Floating cities longer than skyscrapers are tall.",   cat: "Engineering", votes: 174 },
-            { topic: "Hottest places on Earth",             teaser: "Where the thermometer gives up.",                     cat: "Nature",      votes: 158 },
-            { topic: "Coldest places on Earth",             teaser: "Colder than your freezer — by 100 degrees.",         cat: "Nature",      votes: 141 },
-            { topic: "Largest deserts in the world",        teaser: "The biggest desert is not made of sand.",             cat: "Nature",      votes: 122 }
+            { topic: "Tallest buildings in the world",   teaser: "The race for the sky — who owns it right now?", cat: "engineering", votes: 342 },
+            { topic: "Deepest oceanic trenches",          teaser: "Down where the pressure crushes steel.",          cat: "nature",      votes: 318 },
+            { topic: "Fastest land animals",             teaser: "Zero to prey in under three seconds.",            cat: "nature",      votes: 295 },
+            { topic: "Largest earthquakes ever recorded",teaser: "The ground moved — a lot.",                       cat: "nature",      votes: 271 },
+            { topic: "Tallest mountains on Earth",       teaser: "Eight-thousanders and the roof of the world.",    cat: "nature",      votes: 254 },
+            { topic: "Fastest production cars",          teaser: "Street-legal machines chasing 500 km/h.",         cat: "engineering", votes: 238 },
+            { topic: "Most powerful volcanic eruptions", teaser: "Eruptions that changed the climate.",             cat: "nature",      votes: 219 },
+            { topic: "Longest rivers in the world",      teaser: "The Nile vs. Amazon debate, by the numbers.",      cat: "nature",      votes: 196 },
+            { topic: "Biggest ships ever built",         teaser: "Floating giants longer than skyscrapers are tall.",cat: "engineering", votes: 174 },
+            { topic: "Largest planets in the solar system", teaser: "Gas giants ranked by pure bulk.",             cat: "space",       votes: 163 },
+            { topic: "Hottest places on Earth",          teaser: "Where the thermometer gives up.",                 cat: "nature",      votes: 158 },
+            { topic: "Deadliest pandemics in history",   teaser: "The outbreaks that reshaped the world.",          cat: "history",     votes: 147 }
         ];
 
         const VOTED_KEY = "extt_voted_topics";
@@ -109,24 +180,24 @@
             const v = localStorage.getItem("extt_votes_" + t.topic);
             return v === null ? t.votes : parseInt(v, 10);
         }
-        function hasVoted(t) { return getVoted().includes(t.topic); }
 
         function renderTrending() {
             const grid = document.getElementById("trending");
             const voted = getVoted();
             const items = TRENDING_SEED.slice().sort((a, b) => votesFor(b) - votesFor(a));
             grid.innerHTML = items.map(t => {
+                const c = CATS[t.cat] || CATS.nature;
                 const v = votesFor(t);
-                const votedCls = voted.includes(t.topic) ? " voted" : "";
-                const label = voted.includes(t.topic) ? "&#10003; Voted" : "&#9650; Upvote";
+                const isVoted = voted.includes(t.topic);
                 return `
-                <div class="trend-card" onclick="pickTopic(${JSON.stringify(t.topic).replace(/"/g, "&quot;")})">
-                    <span class="trend-cat">${esc(t.cat)}</span>
-                    <p class="trend-topic">Top 10: ${esc(t.topic)}</p>
+                <div class="trend-card" style="--cat:${c.color}" onclick='pickTopic(${JSON.stringify(t.topic)})'>
+                    <div class="trend-emoji">${c.emoji}</div>
+                    <div class="trend-cat">${c.label}</div>
+                    <p class="trend-topic">${esc(t.topic)}</p>
                     <p class="trend-teaser">${esc(t.teaser)}</p>
                     <div class="trend-foot">
-                        <span class="trend-votes">${v} votes</span>
-                        <button class="vote-btn${votedCls}" onclick="upvote(event, ${JSON.stringify(t.topic).replace(/"/g, "&quot;")})">${label}</button>
+                        <span class="trend-votes">▲ ${v}</span>
+                        <button class="vote-btn${isVoted ? " voted" : ""}" onclick='upvote(event, ${JSON.stringify(t.topic)})'>${isVoted ? "✓ Voted" : "Upvote"}</button>
                     </div>
                 </div>`;
             }).join("");
@@ -146,7 +217,6 @@
         function pickTopic(topic) {
             document.getElementById("topicInput").value = topic;
             fetchTopTen();
-            document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
         function recordRecent(topic) {
@@ -164,7 +234,7 @@
             if (!recent.length) { wrap.style.display = "none"; return; }
             wrap.style.display = "";
             document.getElementById("recent").innerHTML = recent.map(t =>
-                `<span class="recent-chip" onclick="pickTopic(${JSON.stringify(t).replace(/"/g, "&quot;")})">${esc(t)}</span>`
+                `<span class="recent-chip" onclick='pickTopic(${JSON.stringify(t)})'>${esc(t)}</span>`
             ).join("");
         }
 
@@ -174,55 +244,119 @@
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') fetchTopTen();
+        /* ---------- views ---------- */
+        function showHome() {
+            document.getElementById("resultsView").style.display = "none";
+            document.getElementById("homeView").style.display = "";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        function showResults(html) {
+            document.getElementById("homeView").style.display = "none";
+            const v = document.getElementById("resultsView");
+            v.innerHTML = html;
+            v.style.display = "";
+            window.scrollTo({ top: 0 });
+        }
+
+        /* ---------- loading ---------- */
+        const LOAD_MSGS = [
+            "Waking the server…",
+            "Consulting the record books…",
+            "Verifying measurements…",
+            "Ranking the contenders…",
+            "Polishing the trophies…"
+        ];
+        let loadTimer = null;
+        function startLoading() {
+            let i = 0;
+            showResults(`
+                <div class="res-top">
+                    <button class="back-btn" onclick="cancelLoad()">← Topics</button>
+                    <span class="src-pill">working…</span>
+                </div>
+                <div class="loading-box">
+                    <div class="spinner"></div>
+                    <div class="loading-msg" id="loadMsg">${LOAD_MSGS[0]}</div>
+                    <div class="loading-sub">First load can take ~20 seconds on the free tier.<br>Hang tight — good lists are worth it.</div>
+                </div>`);
+            loadTimer = setInterval(() => {
+                i = (i + 1) % LOAD_MSGS.length;
+                const el = document.getElementById("loadMsg");
+                if (el) el.textContent = LOAD_MSGS[i];
+            }, 1600);
+        }
+        function stopLoading() { if (loadTimer) { clearInterval(loadTimer); loadTimer = null; } }
+        let abortCtrl = null;
+        function cancelLoad() { stopLoading(); if (abortCtrl) abortCtrl.abort(); showHome(); }
+
+        function handleKeyPress(e) { if (e.key === 'Enter') fetchTopTen(); }
+
+        function medalFor(rank) {
+            if (rank === 1) return `<span class="medal">🥇</span>`;
+            if (rank === 2) return `<span class="medal">🥈</span>`;
+            if (rank === 3) return `<span class="medal">🥉</span>`;
+            return `<span class="rank-num">#${esc(rank)}</span>`;
         }
 
         async function fetchTopTen() {
             const topic = document.getElementById('topicInput').value.trim();
-            const resultsDiv = document.getElementById('results');
-            if(!topic) return;
-
-            resultsDiv.innerHTML = '<div class="loading">Querying verified global records and compiling data...</div>';
-
+            if (!topic) return;
+            abortCtrl = new AbortController();
+            startLoading();
             try {
                 const response = await fetch('/api/get-top-ten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic: topic })
+                    body: JSON.stringify({ topic: topic }),
+                    signal: abortCtrl.signal
                 });
-
                 const resData = await response.json();
-                if(!response.ok) throw new Error(resData.detail || 'Failed to fetch data');
+                if (!response.ok) throw new Error(resData.detail || 'Failed to fetch data');
+                stopLoading();
 
                 const data = resData.data;
-                const src = resData.source === 'cache' ? 'from cache' : 'generated live';
-                let html = `<h2 style="color: #f8fafc; margin-top: 2rem;">${esc(data.title)}</h2>`
-                    + `<p style="color:var(--text-muted); margin-bottom: 1.5rem;">${esc(data.description)} <span style="font-size:0.8em;">(${esc(src)})</span></p>`;
-
-                (data.items || []).forEach(item => {
-                    html += `
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="rank">#${esc(item.rank)} &mdash; ${esc(item.name)}</span>
-                                <span class="stat-badge">${esc(item.key_stat)}</span>
-                            </div>
+                const live = resData.source !== 'cache';
+                const items = (data.items || []).map(item => `
+                    <div class="res-item" onclick="this.classList.toggle('open')">
+                        <div class="res-row">
+                            ${medalFor(item.rank)}
+                            <span class="res-name">${esc(item.name)}</span>
+                            <span class="stat-badge">${esc(item.key_stat)}</span>
+                            <span class="chev">▾</span>
+                        </div>
+                        <div class="res-detail">
                             <p>${esc(item.summary)}</p>
-                            <div class="meta">
-                                <span>Context: ${esc(item.location_or_year)}</span>
-                                <span>Source: ${esc(item.source)}</span>
+                            <div class="res-meta">
+                                <span>📍 ${esc(item.location_or_year)}</span>
+                                <span>📚 ${esc(item.source)}</span>
                             </div>
                         </div>
-                    `;
-                });
+                    </div>`).join("");
 
-                resultsDiv.innerHTML = html;
+                showResults(`
+                    <div class="res-top">
+                        <button class="back-btn" onclick="showHome()">← Topics</button>
+                        <span class="src-pill${live ? " live" : ""}">${live ? "⚡ generated live" : "💾 from cache"}</span>
+                    </div>
+                    <h2 class="res-title">${esc(data.title)}</h2>
+                    <p class="res-desc">${esc(data.description)}</p>
+                    <div>${items}</div>`);
                 recordRecent(topic);
             } catch (err) {
-                resultsDiv.innerHTML = `<div class="card" style="border-color: #ef4444;"><p style="color:#ef4444; margin:0;">Error: ${esc(err.message)}</p></div>`;
+                stopLoading();
+                if (err.name === 'AbortError') return;
+                showResults(`
+                    <div class="res-top">
+                        <button class="back-btn" onclick="showHome()">← Topics</button>
+                        <span class="src-pill">error</span>
+                    </div>
+                    <div class="err-card"><p>😞 ${esc(err.message)}</p></div>`);
             }
         }
 
+        // Warm up the free-tier instance while the visitor browses,
+        // so the first generation doesn't pay the full cold-start cost.
+        fetch('/api/health').catch(() => {});
         renderTrending();
         renderRecent();
     </script>
