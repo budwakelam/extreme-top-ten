@@ -16,10 +16,10 @@
             --accent-hover: #0284c7;
         }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem 1rem; }
-        .container { max-width: 800px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; }
         h1 { text-align: center; color: var(--accent); letter-spacing: 1px; margin-bottom: 0.5rem; }
         .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 2.5rem; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 2rem; }
         input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 16px; outline: none; min-width: 0; }
         input:focus { border-color: var(--accent); }
         button { padding: 14px 28px; border-radius: 8px; border: none; background: var(--accent-hover); color: white; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s; white-space: nowrap; }
@@ -32,6 +32,24 @@
         .meta { color: var(--text-muted); font-size: 0.85rem; display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--border); padding-top: 0.75rem; flex-wrap: wrap; }
         .loading { text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem; }
         .src-tag { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 2rem; }
+
+        /* ---- Trending / popularity mock ---- */
+        .section-title { color: var(--text); font-size: 1.1rem; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 8px; }
+        .section-title .hint { font-size: 0.78rem; color: var(--text-muted); font-weight: normal; }
+        .trend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 2.5rem; }
+        .trend-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; cursor: pointer; transition: border-color 0.15s, transform 0.15s; position: relative; }
+        .trend-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .trend-cat { display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 2px 8px; margin-bottom: 0.6rem; }
+        .trend-topic { font-weight: bold; font-size: 1rem; margin: 0 0 0.4rem 0; color: var(--text); }
+        .trend-teaser { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 0.8rem 0; line-height: 1.45; }
+        .trend-foot { display: flex; justify-content: space-between; align-items: center; }
+        .trend-votes { font-size: 0.8rem; color: var(--text-muted); }
+        .vote-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+        .vote-btn:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+        .vote-btn.voted { border-color: var(--accent); color: var(--accent); cursor: default; }
+        .recent-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.5rem; }
+        .recent-chip { font-size: 0.85rem; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 20px; padding: 6px 14px; cursor: pointer; }
+        .recent-chip:hover { color: var(--accent); border-color: var(--accent); }
     </style>
 </head>
 <body>
@@ -45,18 +63,119 @@
         </div>
 
         <div id="results"></div>
+
+        <h2 class="section-title">&#128293; Trending now <span class="hint">what visitors are generating &amp; upvoting</span></h2>
+        <div id="trending" class="trend-grid"></div>
+
+        <div id="recentWrap" style="display:none;">
+            <h2 class="section-title">Recently generated <span class="hint">on this device</span></h2>
+            <div id="recent" class="recent-row"></div>
+        </div>
+
         <div class="src-tag">extremetop10.com — impartial, data-informed top 10s</div>
     </div>
 
     <script>
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') fetchTopTen();
+        /* ============================================================
+           MOCK popularity layer.
+           Right now: votes + recent history live in localStorage, and the
+           trending list is a hand-picked seed array below.
+           Later (real): GET /api/trending served from server-side counts of
+           what visitors actually generate + their upvotes.
+           ============================================================ */
+        const TRENDING_SEED = [
+            { topic: "Tallest buildings in the world",      teaser: "The race for the sky — from the Burj Khalifa upward.", cat: "Engineering", votes: 342 },
+            { topic: "Deepest oceanic trenches",             teaser: "Down where the pressure crushes steel.",              cat: "Nature",      votes: 318 },
+            { topic: "Fastest land animals",                teaser: "Zero to prey in under three seconds.",                cat: "Nature",      votes: 295 },
+            { topic: "Largest earthquakes ever recorded",   teaser: "The ground moved — a lot.",                           cat: "Nature",      votes: 271 },
+            { topic: "Tallest mountains on Earth",          teaser: "Eight-thousanders and the roof of the world.",        cat: "Nature",      votes: 254 },
+            { topic: "Fastest production cars",             teaser: "Street-legal machines chasing 500 km/h.",             cat: "Engineering", votes: 238 },
+            { topic: "Most powerful volcanic eruptions",    teaser: "Eruptions that changed the climate.",                 cat: "Nature",      votes: 219 },
+            { topic: "Longest rivers in the world",         teaser: "The Nile vs. Amazon debate, settled by the numbers.", cat: "Nature",      votes: 196 },
+            { topic: "Biggest ships ever built",            teaser: "Floating cities longer than skyscrapers are tall.",   cat: "Engineering", votes: 174 },
+            { topic: "Hottest places on Earth",             teaser: "Where the thermometer gives up.",                     cat: "Nature",      votes: 158 },
+            { topic: "Coldest places on Earth",             teaser: "Colder than your freezer — by 100 degrees.",         cat: "Nature",      votes: 141 },
+            { topic: "Largest deserts in the world",        teaser: "The biggest desert is not made of sand.",             cat: "Nature",      votes: 122 }
+        ];
+
+        const VOTED_KEY = "extt_voted_topics";
+        const RECENT_KEY = "extt_recent_topics";
+
+        function getVoted() {
+            try { return JSON.parse(localStorage.getItem(VOTED_KEY) || "[]"); }
+            catch { return []; }
+        }
+        function votesFor(t) {
+            const v = localStorage.getItem("extt_votes_" + t.topic);
+            return v === null ? t.votes : parseInt(v, 10);
+        }
+        function hasVoted(t) { return getVoted().includes(t.topic); }
+
+        function renderTrending() {
+            const grid = document.getElementById("trending");
+            const voted = getVoted();
+            const items = TRENDING_SEED.slice().sort((a, b) => votesFor(b) - votesFor(a));
+            grid.innerHTML = items.map(t => {
+                const v = votesFor(t);
+                const votedCls = voted.includes(t.topic) ? " voted" : "";
+                const label = voted.includes(t.topic) ? "&#10003; Voted" : "&#9650; Upvote";
+                return `
+                <div class="trend-card" onclick="pickTopic(${JSON.stringify(t.topic).replace(/"/g, "&quot;")})">
+                    <span class="trend-cat">${esc(t.cat)}</span>
+                    <p class="trend-topic">Top 10: ${esc(t.topic)}</p>
+                    <p class="trend-teaser">${esc(t.teaser)}</p>
+                    <div class="trend-foot">
+                        <span class="trend-votes">${v} votes</span>
+                        <button class="vote-btn${votedCls}" onclick="upvote(event, ${JSON.stringify(t.topic).replace(/"/g, "&quot;")})">${label}</button>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        function upvote(ev, topic) {
+            ev.stopPropagation();
+            const voted = getVoted();
+            if (voted.includes(topic)) return;
+            voted.push(topic);
+            localStorage.setItem(VOTED_KEY, JSON.stringify(voted));
+            const seed = TRENDING_SEED.find(t => t.topic === topic);
+            localStorage.setItem("extt_votes_" + topic, String(votesFor(seed) + 1));
+            renderTrending();
+        }
+
+        function pickTopic(topic) {
+            document.getElementById("topicInput").value = topic;
+            fetchTopTen();
+            document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function recordRecent(topic) {
+            let recent = [];
+            try { recent = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch {}
+            recent = [topic].concat(recent.filter(t => t.toLowerCase() !== topic.toLowerCase())).slice(0, 8);
+            localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+            renderRecent();
+        }
+
+        function renderRecent() {
+            let recent = [];
+            try { recent = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch {}
+            const wrap = document.getElementById("recentWrap");
+            if (!recent.length) { wrap.style.display = "none"; return; }
+            wrap.style.display = "";
+            document.getElementById("recent").innerHTML = recent.map(t =>
+                `<span class="recent-chip" onclick="pickTopic(${JSON.stringify(t).replace(/"/g, "&quot;")})">${esc(t)}</span>`
+            ).join("");
         }
 
         function esc(s) {
             return String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') fetchTopTen();
         }
 
         async function fetchTopTen() {
@@ -98,10 +217,14 @@
                 });
 
                 resultsDiv.innerHTML = html;
+                recordRecent(topic);
             } catch (err) {
                 resultsDiv.innerHTML = `<div class="card" style="border-color: #ef4444;"><p style="color:#ef4444; margin:0;">Error: ${esc(err.message)}</p></div>`;
             }
         }
+
+        renderTrending();
+        renderRecent();
     </script>
 </body>
 </html>

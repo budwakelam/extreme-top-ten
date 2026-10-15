@@ -108,7 +108,7 @@ async def get_top_ten(req: QueryRequest):
     """
 
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-3.8-flash")
         response = model.generate_content(
             prompt, generation_config={"response_mime_type": "application/json"}
         )
