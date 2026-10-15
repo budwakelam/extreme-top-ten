@@ -425,19 +425,20 @@
 
                 const data = resData.data;
                 const live = resData.source !== 'cache';
-                const first = (data.items || [])[0];
+                const items0 = data.items || [];
+                const heroItem = items0.find(it => it.image) || items0[0];
                 const creditLine = (img) =>
                     `<div class="img-credit">📷 <a href="${esc(img.page_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(img.credit)}</a> via Wikimedia Commons${img.license ? " · " + esc(img.license) : ""}</div>`;
-                const banner = (first && first.image) ? `
+                const banner = heroItem ? `
                     <div class="res-banner">
-                        <img src="${esc(first.image.thumb)}" alt="${esc(first.name)}">
+                        ${heroItem.image ? `<img src="${esc(heroItem.image.thumb)}" alt="${esc(heroItem.name)}">` : ""}
                         <div class="shade"></div>
                         <div class="cap">
-                            <div class="kicker">👑 Number one</div>
-                            <p class="headline">${esc(first.name)} — ${esc(first.key_stat)}</p>
+                            <div class="kicker">${heroItem.rank === 1 ? "👑 Number one" : "🌟 Featured"}</div>
+                            <p class="headline">${esc(heroItem.name)} — ${esc(heroItem.key_stat)}</p>
                         </div>
                     </div>
-                    ${creditLine(first.image)}` : "";
+                    ${heroItem.image ? creditLine(heroItem.image) : ""}` : "";
                 const items = (data.items || []).map(item => {
                     const imgHtml = item.image ? `
                         <a href="${esc(item.image.page_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
